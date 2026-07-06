@@ -1,0 +1,78 @@
+# =============================================================================
+# PM2 Manager — systemd service unit (Ubuntu / any systemd Linux)
+#
+# EDIT the values marked  <<< EDIT  to match your server, then install with:
+#
+#   sudo cp deploy/pm2manager.service /etc/systemd/system/pm2manager.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now pm2manager      # start now + on every boot
+#   systemctl status pm2manager
+#   journalctl -u pm2manager -f                 # follow logs
+#
+# IMPORTANT: run this service as the SAME unprivileged user whose PM2 processes
+# you want to manage. PM2 runs one daemon per user (under that user's ~/.pm2),
+# and this app can only see/control the daemon of the user it runs as.
+# Do NOT run it as root.
+# =============================================================================
+
+[Unit]
+Description=PM2 Manager (secure web UI for managing PM2 processes)
+Documentation=https://github.com/iabdo9/pm2manager
+After=network-online.target
+Wants=network-online.target
+# Optional: start after the managing user's PM2 daemon (created by `pm2 startup`).
+# Replace <USER> with the User= value below, then uncomment:
+# After=pm2-<USER>.service
+
+[Service]
+Type=simple
+
+# <<< EDIT: the OS user/group that owns your PM2 processes (never root)
+User=deploy
+Group=deploy
+
+# <<< EDIT: absolute path to the built project (the folder containing dist/ and .env)
+WorkingDirectory=/opt/pm2manager
+
+# <<< EDIT: absolute path to the node binary — run `which node` to find it.
+#   NodeSource / apt install : /usr/bin/node
+#   nvm install              : /home/deploy/.nvm/versions/node/v22.x.x/bin/node
+ExecStart=/usr/bin/node dist/index.js
+
+# <<< EDIT: HOME + PM2_HOME of the User above, so the app finds that user's PM2
+# daemon. systemd does not run a login shell, so these MUST be set explicitly.
+Environment=HOME=/home/deploy
+Environment=PM2_HOME=/home/deploy/.pm2
+Environment=NODE_ENV=production
+
+# App configuration is read from the project's .env (via dotenv) because
+# WorkingDirectory is set. To load it from a dedicated file instead, uncomment:
+# EnvironmentFile=/opt/pm2manager/.env
+
+# Restart on failure with a short backoff.
+Restart=on-failure
+RestartSec=5
+
+# Graceful shutdown: index.ts handles SIGTERM (stops metrics, disconnects PM2,
+# closes SSE connections, closes the SQLite database).
+KillSignal=SIGTERM
+TimeoutStopSec=25
+
+# Send stdout/stderr to the journal (view with: journalctl -u pm2manager).
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pm2manager
+
+# --- Sandboxing / hardening (safe defaults) ----------------------------------
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectControlGroups=true
+ProtectKernelTunables=true
+RestrictSUIDSGID=true
+# Do NOT enable ProtectHome — the app must read the user's ~/.pm2 (PM2_HOME).
+# If you deploy under /opt AND switch to ProtectSystem=strict, grant writes:
+#   ReadWritePaths=/opt/pm2manager/data /home/deploy/.pm2
+
+[Install]
+WantedBy=multi-user.target
