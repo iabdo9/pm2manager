@@ -719,7 +719,7 @@
       pollTimer = setInterval(function () {
         if (qs('.menu.open') || byId('modal-overlay').classList.contains('open')) return; // don't disrupt interactions
         Promise.resolve().then(function () { return loadView(name); }).catch(function () { });
-      }, 500);
+      }, 5000);
     }
   }
 
