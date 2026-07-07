@@ -35,6 +35,13 @@
   var daemonVersion = null; // last known PM2 version, kept across views
   var lastFocus = null;     // element to restore focus to when drawer/modal close
 
+  // Polling cadence. The Dashboard refreshes its live summary every 0.5s; the
+  // charts refresh only every HISTORY_REFRESH_TICKS ticks (~15s) because the
+  // server samples metric history at that interval — redrawing faster is waste.
+  var DASHBOARD_POLL_MS = 500;
+  var PROCESS_POLL_MS = 5000;
+  var HISTORY_REFRESH_TICKS = 30; // 30 × 500ms ≈ 15s
+
   var VIEW_TITLES = {
     dashboard: 'Dashboard', processes: 'Processes',
     logs: 'Logs', activity: 'Activity', settings: 'Settings'
@@ -207,7 +214,13 @@
   // ======================================================================
   // Dashboard
   // ======================================================================
+  // Full load: live summary + charts (used when the view is opened).
   function loadDashboard() {
+    return loadDashboardSummary().then(loadHistory);
+  }
+
+  // Live summary only — this is what the fast (0.5s) poll refreshes.
+  function loadDashboardSummary() {
     return api.get('/api/dashboard').then(function (d) {
       renderKpis(d);
       renderSystem(d.system);
@@ -223,11 +236,16 @@
           el('span', { class: 'spacer', text: 'The PM2 daemon is not reachable. Process data is unavailable until it is running.' })
         ]));
       }
-      return api.get('/api/history?range=6h').then(function (h) {
-        lastHistory = (h && h.points) || [];
-        redrawCharts();
-      }).catch(function () { lastHistory = []; redrawCharts(); });
     });
+  }
+
+  // Charts only. History is sampled server-side every ~15s, so it is refreshed
+  // on a slower cadence than the live summary (no point re-drawing at 0.5s).
+  function loadHistory() {
+    return api.get('/api/history?range=6h').then(function (h) {
+      lastHistory = (h && h.points) || [];
+      redrawCharts();
+    }).catch(function () { lastHistory = []; redrawCharts(); });
   }
 
   function kpiTile(label, value, unit, iconName, variant) {
@@ -715,11 +733,27 @@
 
     Promise.resolve().then(function () { return loadView(name); }).catch(reportError);
 
-    if (name === 'dashboard' || name === 'processes') {
+    var interval = name === 'dashboard' ? DASHBOARD_POLL_MS : name === 'processes' ? PROCESS_POLL_MS : 0;
+    if (interval) {
+      var tick = 0;
+      var busy = false; // skip a tick if the previous refresh is still in flight
       pollTimer = setInterval(function () {
-        if (qs('.menu.open') || byId('modal-overlay').classList.contains('open')) return; // don't disrupt interactions
-        Promise.resolve().then(function () { return loadView(name); }).catch(function () { });
-      }, 5000);
+        // Don't disrupt an open menu / dialog / drawer with a re-render.
+        if (busy || qs('.menu.open') || byId('modal-overlay').classList.contains('open') ||
+            byId('drawer').classList.contains('open')) return;
+        tick++;
+        busy = true;
+        var done = function () { busy = false; };
+        if (name === 'dashboard') {
+          // Refresh the live summary every tick; refresh the charts far less
+          // often (server samples history only every ~15s).
+          var jobs = [loadDashboardSummary().catch(function () { })];
+          if (tick % HISTORY_REFRESH_TICKS === 0) jobs.push(loadHistory().catch(function () { }));
+          Promise.all(jobs).then(done, done);
+        } else {
+          Promise.resolve().then(function () { return loadView(name); }).then(done, done);
+        }
+      }, interval);
     }
   }
 
