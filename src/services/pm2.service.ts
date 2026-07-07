@@ -310,8 +310,17 @@ class Pm2Service {
     return first ? toProcessDetail(first) : null;
   }
 
+  /**
+   * Start an existing (stopped) process by id or name.
+   *
+   * PM2's programmatic `pm2.start()` is designed to launch a *new* process from
+   * a script/options object and fails when handed the id/name of an already-
+   * managed process. To bring an existing stopped process back online we use
+   * `restart`, which is what `pm2 start <id>` does on the CLI (restarting a
+   * stopped process starts it).
+   */
   start(idOrName: string | number): Promise<void> {
-    return this.guarded(() => pAction('start', idOrName), `Failed to start "${idOrName}"`);
+    return this.guarded(() => pAction('restart', idOrName), `Failed to start "${idOrName}"`);
   }
 
   stop(idOrName: string | number): Promise<void> {

@@ -1,0 +1,78 @@
+# ---------------------------------------------------------------------------
+# PM2 Manager — .gitignore
+# ---------------------------------------------------------------------------
+
+# --- Dependencies ----------------------------------------------------------
+node_modules/
+.pnp
+.pnp.*
+jspm_packages/
+
+# --- Build output ----------------------------------------------------------
+dist/
+build/
+*.tsbuildinfo
+.tsbuildinfo
+
+# --- Environment / secrets -------------------------------------------------
+# Ignore all env files EXCEPT the committed template.
+.env
+.env.*
+!.env.example
+
+# --- Application data (SQLite DB + WAL/SHM sidecar files) -------------------
+data/
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# --- Logs ------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- PM2 runtime -----------------------------------------------------------
+.pm2/
+*.pid
+pids/
+
+# --- Test / coverage -------------------------------------------------------
+coverage/
+.nyc_output/
+*.lcov
+
+# --- Caches ----------------------------------------------------------------
+.cache/
+.npm/
+.eslintcache
+.parcel-cache/
+*.tgz
+.node_repl_history
+
+# --- OS files --------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# --- Editors / IDEs --------------------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.history/
