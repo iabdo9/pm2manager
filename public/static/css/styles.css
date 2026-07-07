@@ -152,6 +152,10 @@ canvas { display: block; }
   height: 100%;
 }
 
+/* Mobile nav backdrop — kept out of flow at all widths (only shown on small
+   screens when the sidebar is open) so it never occupies a grid cell. */
+.nav-scrim { display: none; position: fixed; inset: 0; z-index: 105; background: var(--overlay); }
+
 /* ---- Sidebar ----------------------------------------------------------- */
 .sidebar {
   grid-column: 1;
@@ -714,7 +718,6 @@ input::placeholder { color: var(--text-subtle); }
     transform: translateX(-100%); transition: transform 180ms ease; box-shadow: var(--shadow-2);
   }
   .app-shell.nav-open .sidebar { transform: none; }
-  .nav-scrim { position: fixed; inset: 0; z-index: 105; background: var(--overlay); display: none; }
   .app-shell.nav-open .nav-scrim { display: block; }
   .main { grid-column: 1; }
   .menu-toggle { display: inline-flex; }

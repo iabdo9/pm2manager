@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,319 +10,624 @@
   <link rel="stylesheet" href="/static/css/styles.css">
   <script src="/static/js/theme.js"></script>
 </head>
+
 <body>
 
-<!-- Icon sprite (hidden; `hidden` attr keeps it out of layout even if CSS is cached/stale) -->
-<svg class="sprite" hidden aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="i-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></symbol>
-  <symbol id="i-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><line x1="7" y1="7.5" x2="7.01" y2="7.5"/><line x1="7" y1="16.5" x2="7.01" y2="16.5"/></symbol>
-  <symbol id="i-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></symbol>
-  <symbol id="i-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
-  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3.5-4 3 2.5L21 6"/></symbol>
-  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="9" cy="8" r="2.4"/><circle cx="15" cy="16" r="2.4"/></symbol>
-  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/><line x1="5.2" y1="5.2" x2="7" y2="7"/><line x1="17" y1="17" x2="18.8" y2="18.8"/><line x1="5.2" y1="18.8" x2="7" y2="17"/><line x1="17" y1="7" x2="18.8" y2="5.2"/></symbol>
-  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 13.2A8.3 8.3 0 1 1 10.8 3.5 6.5 6.5 0 0 0 20.5 13.2Z"/></symbol>
-  <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
-  <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M7 5.2 19.2 12 7 18.8Z"/></symbol>
-  <symbol id="i-stop" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6.5" y="6.5" width="11" height="11" rx="1.6"/></symbol>
-  <symbol id="i-restart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 21v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></symbol>
-  <symbol id="i-reload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
-  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 4 21 10 15 10"/><path d="M20 10A9 9 0 1 0 21 15"/></symbol>
-  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 20 7"/><path d="M6 7v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></symbol>
-  <symbol id="i-more" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></symbol>
-  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
-  <symbol id="i-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
-  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
-  <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13.5"/><line x1="12" y1="17.5" x2="12.01" y2="17.5"/></symbol>
-  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
-  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
-  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></symbol>
-  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><line x1="12" y1="11" x2="12" y2="16.5"/><line x1="12" y1="7.5" x2="12.01" y2="7.5"/></symbol>
-  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><polyline points="12 7 12 12 16 14"/></symbol>
-  <symbol id="i-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><line x1="9" y1="2.5" x2="9" y2="5"/><line x1="15" y1="2.5" x2="15" y2="5"/><line x1="9" y1="19" x2="9" y2="21.5"/><line x1="15" y1="19" x2="15" y2="21.5"/><line x1="2.5" y1="9" x2="5" y2="9"/><line x1="2.5" y1="15" x2="5" y2="15"/><line x1="19" y1="9" x2="21.5" y2="9"/><line x1="19" y1="15" x2="21.5" y2="15"/></symbol>
-  <symbol id="i-mem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13"/><path d="M20 12c0 1.7-3.6 3-8 3s-8-1.3-8-3"/></symbol>
-  <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5"/><line x1="12" y1="13" x2="12" y2="21"/></symbol>
-  <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></symbol>
-  <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3"/><path d="M17 6l3 3"/><path d="M15 8l2 2"/></symbol>
-</svg>
+  <!-- Icon sprite (hidden; `hidden` attr keeps it out of layout even if CSS is cached/stale) -->
+  <svg class="sprite" hidden aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+    </symbol>
+    <symbol id="i-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="7" rx="2" />
+      <rect x="3" y="13" width="18" height="7" rx="2" />
+      <line x1="7" y1="7.5" x2="7.01" y2="7.5" />
+      <line x1="7" y1="16.5" x2="7.01" y2="16.5" />
+    </symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="4 17 10 11 4 5" />
+      <line x1="12" y1="19" x2="20" y2="19" />
+    </symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M3 3v18h18" />
+      <path d="M7 14l3.5-4 3 2.5L21 6" />
+    </symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round">
+      <line x1="4" y1="8" x2="20" y2="8" />
+      <line x1="4" y1="16" x2="20" y2="16" />
+      <circle cx="9" cy="8" r="2.4" />
+      <circle cx="15" cy="16" r="2.4" />
+    </symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4.2" />
+      <line x1="12" y1="2.5" x2="12" y2="5" />
+      <line x1="12" y1="19" x2="12" y2="21.5" />
+      <line x1="2.5" y1="12" x2="5" y2="12" />
+      <line x1="19" y1="12" x2="21.5" y2="12" />
+      <line x1="5.2" y1="5.2" x2="7" y2="7" />
+      <line x1="17" y1="17" x2="18.8" y2="18.8" />
+      <line x1="5.2" y1="18.8" x2="7" y2="17" />
+      <line x1="17" y1="7" x2="18.8" y2="5.2" />
+    </symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M20.5 13.2A8.3 8.3 0 1 1 10.8 3.5 6.5 6.5 0 0 0 20.5 13.2Z" />
+    </symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+      <path d="M7 5.2 19.2 12 7 18.8Z" />
+    </symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+      <rect x="6.5" y="6.5" width="11" height="11" rx="1.6" />
+    </symbol>
+    <symbol id="i-restart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M21 3v6h-6" />
+      <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+      <path d="M3 21v-6h6" />
+      <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+    </symbol>
+    <symbol id="i-reload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <polyline points="17 1 21 5 17 9" />
+      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+      <polyline points="7 23 3 19 7 15" />
+      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+    </symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <polyline points="21 4 21 10 15 10" />
+      <path d="M20 10A9 9 0 1 0 21 15" />
+    </symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <polyline points="4 7 20 7" />
+      <path d="M6 7v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7" />
+      <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+      <line x1="10" y1="11" x2="10" y2="17" />
+      <line x1="14" y1="11" x2="14" y2="17" />
+    </symbol>
+    <symbol id="i-more" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+      <circle cx="12" cy="5" r="1.8" />
+      <circle cx="12" cy="12" r="1.8" />
+      <circle cx="12" cy="19" r="1.8" />
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </symbol>
+    <symbol id="i-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+      stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9" />
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+      <line x1="12" y1="9" x2="12" y2="13.5" />
+      <line x1="12" y1="17.5" x2="12.01" y2="17.5" />
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <line x1="4" y1="7" x2="20" y2="7" />
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <line x1="4" y1="17" x2="20" y2="17" />
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9.5" />
+      <line x1="12" y1="11" x2="12" y2="16.5" />
+      <line x1="12" y1="7.5" x2="12.01" y2="7.5" />
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9.5" />
+      <polyline points="12 7 12 12 16 14" />
+    </symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <rect x="6" y="6" width="12" height="12" rx="2" />
+      <rect x="9.5" y="9.5" width="5" height="5" rx="1" />
+      <line x1="9" y1="2.5" x2="9" y2="5" />
+      <line x1="15" y1="2.5" x2="15" y2="5" />
+      <line x1="9" y1="19" x2="9" y2="21.5" />
+      <line x1="15" y1="19" x2="15" y2="21.5" />
+      <line x1="2.5" y1="9" x2="5" y2="9" />
+      <line x1="2.5" y1="15" x2="5" y2="15" />
+      <line x1="19" y1="9" x2="21.5" y2="9" />
+      <line x1="19" y1="15" x2="21.5" y2="15" />
+    </symbol>
+    <symbol id="i-mem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <ellipse cx="12" cy="5.5" rx="8" ry="3" />
+      <path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13" />
+      <path d="M20 12c0 1.7-3.6 3-8 3s-8-1.3-8-3" />
+    </symbol>
+    <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" />
+      <path d="M3 8l9 5 9-5" />
+      <line x1="12" y1="13" x2="12" y2="21" />
+    </symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M12 3 3 8l9 5 9-5-9-5Z" />
+      <path d="M3 13l9 5 9-5" />
+    </symbol>
+    <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <circle cx="8" cy="15" r="4" />
+      <path d="M10.8 12.2 20 3" />
+      <path d="M17 6l3 3" />
+      <path d="M15 8l2 2" />
+    </symbol>
+  </svg>
 
-<div class="app-shell" id="shell">
-  <div class="nav-scrim" id="nav-scrim"></div>
+  <div class="app-shell" id="shell">
+    <div class="nav-scrim" id="nav-scrim"></div>
 
-  <!-- Sidebar ---------------------------------------------------------- -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#3b5bd9"/><circle cx="10" cy="11" r="2" fill="#34d399"/><rect x="14" y="10" width="9" height="2" rx="1" fill="#fff"/><rect x="9" y="16" width="14" height="2" rx="1" fill="#fff" fill-opacity="0.85"/><rect x="9" y="21" width="14" height="2" rx="1" fill="#fff" fill-opacity="0.6"/></svg>
-      <span class="brand-name">PM2&nbsp;<b>Manager</b></span>
-    </div>
-    <nav class="sidebar-nav" id="main-nav">
-      <button type="button" class="nav-btn active" data-view="dashboard"><svg class="icon"><use href="#i-dashboard"/></svg><span>Dashboard</span></button>
-      <button type="button" class="nav-btn" data-view="processes"><svg class="icon"><use href="#i-server"/></svg><span>Processes</span></button>
-      <button type="button" class="nav-btn" data-view="metrics"><svg class="icon"><use href="#i-chart"/></svg><span>Metrics</span></button>
-      <button type="button" class="nav-btn" data-view="logs"><svg class="icon"><use href="#i-terminal"/></svg><span>Logs</span></button>
-      <button type="button" class="nav-btn" data-view="activity"><svg class="icon"><use href="#i-activity"/></svg><span>Activity</span></button>
-      <button type="button" class="nav-btn" data-view="settings"><svg class="icon"><use href="#i-settings"/></svg><span>Settings</span></button>
-    </nav>
-    <div class="sidebar-foot">
-      <span class="daemon-pill" id="daemon-status"><span class="dot"></span><span class="label-text">Checking…</span></span>
-    </div>
-  </aside>
-
-  <!-- Main ------------------------------------------------------------- -->
-  <div class="main">
-    <header class="topbar">
-      <button type="button" class="icon-btn menu-toggle" id="nav-toggle" aria-label="Toggle navigation" data-tip="Menu"><svg class="icon"><use href="#i-menu"/></svg></button>
-      <h1 class="topbar-title" id="view-title">Dashboard</h1>
-      <div class="topbar-actions">
-        <button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="Toggle theme" data-tip="Theme">
-          <svg class="icon icon-moon"><use href="#i-moon"/></svg>
-          <svg class="icon icon-sun"><use href="#i-sun"/></svg>
-        </button>
-        <div class="user-chip">
-          <span class="avatar" id="user-avatar">·</span>
-          <span class="who"><span id="current-user"></span> <span class="role" id="user-role"></span></span>
-        </div>
-        <button type="button" class="icon-btn" id="logout-btn" aria-label="Log out" data-tip="Log out"><svg class="icon"><use href="#i-logout"/></svg></button>
+    <!-- Sidebar ---------------------------------------------------------- -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="7" fill="#3b5bd9" />
+          <circle cx="10" cy="11" r="2" fill="#34d399" />
+          <rect x="14" y="10" width="9" height="2" rx="1" fill="#fff" />
+          <rect x="9" y="16" width="14" height="2" rx="1" fill="#fff" fill-opacity="0.85" />
+          <rect x="9" y="21" width="14" height="2" rx="1" fill="#fff" fill-opacity="0.6" />
+        </svg>
+        <span class="brand-name">PM2&nbsp;<b>Manager</b></span>
       </div>
-    </header>
+      <nav class="sidebar-nav" id="main-nav">
+        <button type="button" class="nav-btn active" data-view="dashboard"><svg class="icon">
+            <use href="#i-dashboard" />
+          </svg><span>Dashboard</span></button>
+        <button type="button" class="nav-btn" data-view="processes"><svg class="icon">
+            <use href="#i-server" />
+          </svg><span>Processes</span></button>
+        <button type="button" class="nav-btn" data-view="metrics"><svg class="icon">
+            <use href="#i-chart" />
+          </svg><span>Metrics</span></button>
+        <button type="button" class="nav-btn" data-view="logs"><svg class="icon">
+            <use href="#i-terminal" />
+          </svg><span>Logs</span></button>
+        <button type="button" class="nav-btn" data-view="activity"><svg class="icon">
+            <use href="#i-activity" />
+          </svg><span>Activity</span></button>
+        <button type="button" class="nav-btn" data-view="settings"><svg class="icon">
+            <use href="#i-settings" />
+          </svg><span>Settings</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="daemon-pill" id="daemon-status"><span class="dot"></span><span
+            class="label-text">Checking…</span></span>
+      </div>
+    </aside>
 
-    <main class="content" id="content">
-
-      <!-- Dashboard -->
-      <section id="view-dashboard" class="view">
-        <div class="view-head"><h2>Overview</h2><span class="view-sub" id="dash-sub"></span><span class="spacer"></span>
-          <select id="dash-range" class="range-select" aria-label="Chart time range">
-            <option value="15m">Last 15 minutes</option>
-            <option value="30m">Last 30 minutes</option>
-            <option value="1h">Last hour</option>
-            <option value="6h" selected>Last 6 hours</option>
-            <option value="12h">Last 12 hours</option>
-            <option value="24h">Last 24 hours</option>
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-          </select>
-          <button type="button" class="btn sm" id="dash-refresh"><svg class="icon"><use href="#i-refresh"/></svg>Refresh</button>
-        </div>
-        <div id="dash-error"></div>
-        <div class="kpi-grid" id="dash-kpis"></div>
-        <div class="grid-2 charts">
-          <div class="panel"><div class="panel-head"><span class="panel-title">Overall CPU</span></div><div class="panel-body chart-box"><canvas id="chart-cpu"></canvas></div></div>
-          <div class="panel"><div class="panel-head"><span class="panel-title">Overall memory</span></div><div class="panel-body chart-box"><canvas id="chart-mem"></canvas></div></div>
-        </div>
-        <div class="grid-2">
-          <div class="panel"><div class="panel-head"><span class="panel-title">System</span></div><div class="panel-body"><dl class="kv" id="dash-system"></dl></div></div>
-          <div class="panel"><div class="panel-head"><span class="panel-title">Recent restarts</span></div><div class="panel-body flush"><ul class="feed" id="dash-restarts"></ul></div></div>
-        </div>
-        <div class="panel"><div class="panel-head"><span class="panel-title">Recent activity</span></div><div class="panel-body flush"><ul class="feed" id="dash-activity"></ul></div></div>
-      </section>
-
-      <!-- Processes -->
-      <section id="view-processes" class="view hidden">
-        <div class="view-head">
-          <h2>Processes</h2><span class="badge" id="proc-count"></span>
-          <span class="spacer"></span>
-          <div class="menu" id="bulk-menu">
-            <button type="button" class="btn sm" id="bulk-menu-btn"><svg class="icon"><use href="#i-layers"/></svg>Bulk actions<svg class="icon"><use href="#i-caret"/></svg></button>
-            <div class="menu-list">
-              <button type="button" class="menu-item" data-bulk="start-all"><svg class="icon"><use href="#i-play"/></svg>Start all</button>
-              <button type="button" class="menu-item" data-bulk="restart-all"><svg class="icon"><use href="#i-restart"/></svg>Restart all</button>
-              <button type="button" class="menu-item" data-bulk="reload-all"><svg class="icon"><use href="#i-reload"/></svg>Reload all</button>
-              <div class="menu-sep"></div>
-              <button type="button" class="menu-item danger" data-bulk="stop-all"><svg class="icon"><use href="#i-stop"/></svg>Stop all</button>
-            </div>
+    <!-- Main ------------------------------------------------------------- -->
+    <div class="main">
+      <header class="topbar">
+        <button type="button" class="icon-btn menu-toggle" id="nav-toggle" aria-label="Toggle navigation"
+          data-tip="Menu"><svg class="icon">
+            <use href="#i-menu" />
+          </svg></button>
+        <h1 class="topbar-title" id="view-title">Dashboard</h1>
+        <div class="topbar-actions">
+          <button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="Toggle theme"
+            data-tip="Theme">
+            <svg class="icon icon-moon">
+              <use href="#i-moon" />
+            </svg>
+            <svg class="icon icon-sun">
+              <use href="#i-sun" />
+            </svg>
+          </button>
+          <div class="user-chip">
+            <span class="avatar" id="user-avatar">·</span>
+            <span class="who"><span id="current-user"></span> <span class="role" id="user-role"></span></span>
           </div>
-          <button type="button" class="btn sm" id="refresh-processes"><svg class="icon"><use href="#i-refresh"/></svg>Refresh</button>
+          <button type="button" class="icon-btn" id="logout-btn" aria-label="Log out" data-tip="Log out"><svg
+              class="icon">
+              <use href="#i-logout" />
+            </svg></button>
         </div>
-        <div class="toolbar">
-          <label class="search"><svg class="icon"><use href="#i-search"/></svg><input type="text" id="proc-search" placeholder="Filter by name…" autocomplete="off" aria-label="Filter processes by name"></label>
-          <div class="segmented" id="proc-filter" role="group" aria-label="Filter by status">
-            <button type="button" class="active" data-status="all">All</button>
-            <button type="button" data-status="online">Online</button>
-            <button type="button" data-status="stopped">Stopped</button>
-            <button type="button" data-status="errored">Errored</button>
-          </div>
-        </div>
-        <div class="table-wrap"><div class="table-scroll">
-          <table class="data" id="process-table">
-            <thead><tr>
-              <th class="sortable" data-sort="status"><span class="th-inner">Status <svg class="icon sort-caret"><use href="#i-caret"/></svg></span></th>
-              <th class="sortable" data-sort="name"><span class="th-inner">Process <svg class="icon sort-caret"><use href="#i-caret"/></svg></span></th>
-              <th class="sortable col-num" data-sort="cpu"><span class="th-inner">CPU <svg class="icon sort-caret"><use href="#i-caret"/></svg></span></th>
-              <th class="sortable col-num" data-sort="memory"><span class="th-inner">Memory <svg class="icon sort-caret"><use href="#i-caret"/></svg></span></th>
-              <th class="sortable col-num" data-sort="uptime"><span class="th-inner">Uptime <svg class="icon sort-caret"><use href="#i-caret"/></svg></span></th>
-              <th class="sortable col-num" data-sort="restartCount"><span class="th-inner">Restarts <svg class="icon sort-caret"><use href="#i-caret"/></svg></span></th>
-              <th class="col-actions">Actions</th>
-            </tr></thead>
-            <tbody id="process-tbody"></tbody>
-          </table>
-        </div></div>
-      </section>
+      </header>
 
-      <!-- Metrics (per-process history) -->
-      <section id="view-metrics" class="view hidden">
-        <div class="view-head">
-          <h2>Process metrics</h2>
-          <span class="spacer"></span>
-          <label class="ctl"><span class="ctl-label">Process</span>
-            <select id="metrics-process" aria-label="Select process"></select>
-          </label>
-          <label class="ctl"><span class="ctl-label">Range</span>
-            <select id="metrics-range" class="range-select" aria-label="Time range">
+      <main class="content" id="content">
+
+        <!-- Dashboard -->
+        <section id="view-dashboard" class="view">
+          <div class="view-head">
+            <h2>Overview</h2><span class="view-sub" id="dash-sub"></span><span class="spacer"></span>
+            <select id="dash-range" class="range-select" aria-label="Chart time range">
               <option value="15m">Last 15 minutes</option>
               <option value="30m">Last 30 minutes</option>
-              <option value="1h" selected>Last hour</option>
-              <option value="6h">Last 6 hours</option>
+              <option value="1h">Last hour</option>
+              <option value="6h" selected>Last 6 hours</option>
               <option value="12h">Last 12 hours</option>
               <option value="24h">Last 24 hours</option>
               <option value="7d">Last 7 days</option>
               <option value="30d">Last 30 days</option>
-              <option value="custom">Custom range…</option>
             </select>
-          </label>
-        </div>
+            <button type="button" class="btn sm" id="dash-refresh"><svg class="icon">
+                <use href="#i-refresh" />
+              </svg>Refresh</button>
+          </div>
+          <div id="dash-error"></div>
+          <div class="kpi-grid" id="dash-kpis"></div>
+          <div class="grid-2 charts">
+            <div class="panel">
+              <div class="panel-head"><span class="panel-title">Overall CPU</span></div>
+              <div class="panel-body chart-box"><canvas id="chart-cpu"></canvas></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><span class="panel-title">Overall memory</span></div>
+              <div class="panel-body chart-box"><canvas id="chart-mem"></canvas></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="panel">
+              <div class="panel-head"><span class="panel-title">System</span></div>
+              <div class="panel-body">
+                <dl class="kv" id="dash-system"></dl>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><span class="panel-title">Recent restarts</span></div>
+              <div class="panel-body flush">
+                <ul class="feed" id="dash-restarts"></ul>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><span class="panel-title">Recent activity</span></div>
+            <div class="panel-body flush">
+              <ul class="feed" id="dash-activity"></ul>
+            </div>
+          </div>
+        </section>
 
-        <div id="metrics-custom" class="custom-range hidden">
-          <label class="ctl"><span class="ctl-label">From</span><input type="datetime-local" id="metrics-from"></label>
-          <label class="ctl"><span class="ctl-label">To</span><input type="datetime-local" id="metrics-to"></label>
-          <button type="button" class="btn sm primary" id="metrics-apply">Apply</button>
-        </div>
+        <!-- Processes -->
+        <section id="view-processes" class="view hidden">
+          <div class="view-head">
+            <h2>Processes</h2><span class="badge" id="proc-count"></span>
+            <span class="spacer"></span>
+            <div class="menu" id="bulk-menu">
+              <button type="button" class="btn sm" id="bulk-menu-btn"><svg class="icon">
+                  <use href="#i-layers" />
+                </svg>Bulk actions<svg class="icon">
+                  <use href="#i-caret" />
+                </svg></button>
+              <div class="menu-list">
+                <button type="button" class="menu-item" data-bulk="start-all"><svg class="icon">
+                    <use href="#i-play" />
+                  </svg>Start all</button>
+                <button type="button" class="menu-item" data-bulk="restart-all"><svg class="icon">
+                    <use href="#i-restart" />
+                  </svg>Restart all</button>
+                <button type="button" class="menu-item" data-bulk="reload-all"><svg class="icon">
+                    <use href="#i-reload" />
+                  </svg>Reload all</button>
+                <div class="menu-sep"></div>
+                <button type="button" class="menu-item danger" data-bulk="stop-all"><svg class="icon">
+                    <use href="#i-stop" />
+                  </svg>Stop all</button>
+              </div>
+            </div>
+            <button type="button" class="btn sm" id="refresh-processes"><svg class="icon">
+                <use href="#i-refresh" />
+              </svg>Refresh</button>
+          </div>
+          <div class="toolbar">
+            <label class="search"><svg class="icon">
+                <use href="#i-search" />
+              </svg><input type="text" id="proc-search" placeholder="Filter by name…" autocomplete="off"
+                aria-label="Filter processes by name"></label>
+            <div class="segmented" id="proc-filter" role="group" aria-label="Filter by status">
+              <button type="button" class="active" data-status="all">All</button>
+              <button type="button" data-status="online">Online</button>
+              <button type="button" data-status="stopped">Stopped</button>
+              <button type="button" data-status="errored">Errored</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-scroll">
+              <table class="data" id="process-table">
+                <thead>
+                  <tr>
+                    <th class="sortable" data-sort="status"><span class="th-inner">Status <svg class="icon sort-caret">
+                          <use href="#i-caret" />
+                        </svg></span></th>
+                    <th class="sortable" data-sort="name"><span class="th-inner">Process <svg class="icon sort-caret">
+                          <use href="#i-caret" />
+                        </svg></span></th>
+                    <th class="sortable col-num" data-sort="cpu"><span class="th-inner">CPU <svg
+                          class="icon sort-caret">
+                          <use href="#i-caret" />
+                        </svg></span></th>
+                    <th class="sortable col-num" data-sort="memory"><span class="th-inner">Memory <svg
+                          class="icon sort-caret">
+                          <use href="#i-caret" />
+                        </svg></span></th>
+                    <th class="sortable col-num" data-sort="uptime"><span class="th-inner">Uptime <svg
+                          class="icon sort-caret">
+                          <use href="#i-caret" />
+                        </svg></span></th>
+                    <th class="sortable col-num" data-sort="restartCount"><span class="th-inner">Restarts <svg
+                          class="icon sort-caret">
+                          <use href="#i-caret" />
+                        </svg></span></th>
+                    <th class="col-actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="process-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
 
-        <div id="metrics-error"></div>
+        <!-- Metrics (per-process history) -->
+        <section id="view-metrics" class="view hidden">
+          <div class="view-head">
+            <h2>Process metrics</h2>
+            <span class="spacer"></span>
+            <label class="ctl"><span class="ctl-label">Process</span>
+              <select id="metrics-process" aria-label="Select process"></select>
+            </label>
+            <label class="ctl"><span class="ctl-label">Range</span>
+              <select id="metrics-range" class="range-select" aria-label="Time range">
+                <option value="15m">Last 15 minutes</option>
+                <option value="30m">Last 30 minutes</option>
+                <option value="1h" selected>Last hour</option>
+                <option value="6h">Last 6 hours</option>
+                <option value="12h">Last 12 hours</option>
+                <option value="24h">Last 24 hours</option>
+                <option value="7d">Last 7 days</option>
+                <option value="30d">Last 30 days</option>
+                <option value="custom">Custom range…</option>
+              </select>
+            </label>
+          </div>
 
-        <div class="panel">
-          <div class="panel-head"><span class="panel-title">CPU usage</span><span class="spacer"></span><span class="metric-stat" id="metrics-cpu-stat"></span></div>
-          <div class="panel-body chart-box tall"><canvas id="metrics-chart-cpu"></canvas></div>
-        </div>
-        <div class="panel">
-          <div class="panel-head"><span class="panel-title">Memory usage</span><span class="spacer"></span><span class="metric-stat" id="metrics-mem-stat"></span></div>
-          <div class="panel-body chart-box tall"><canvas id="metrics-chart-mem"></canvas></div>
-        </div>
-        <p class="hint metrics-hint">Drag across a chart to zoom into a time window · double-click a chart to reset.</p>
-      </section>
+          <div id="metrics-custom" class="custom-range hidden">
+            <label class="ctl"><span class="ctl-label">From</span><input type="datetime-local"
+                id="metrics-from"></label>
+            <label class="ctl"><span class="ctl-label">To</span><input type="datetime-local" id="metrics-to"></label>
+            <button type="button" class="btn sm primary" id="metrics-apply">Apply</button>
+          </div>
 
-      <!-- Logs -->
-      <section id="view-logs" class="view hidden">
-        <div class="view-head"><h2>Logs</h2><span class="badge" id="log-count"></span></div>
-        <div class="logs-toolbar">
-          <select id="log-process" aria-label="Select process"></select>
-          <button type="button" class="btn sm primary" id="log-start"><svg class="icon"><use href="#i-play"/></svg>Stream</button>
-          <button type="button" class="btn sm" id="log-stop"><svg class="icon"><use href="#i-stop"/></svg>Stop</button>
-          <button type="button" class="btn sm ghost" id="log-clear">Clear</button>
-          <span class="spacer"></span>
-          <label class="checkbox"><input type="checkbox" id="log-autoscroll" checked> Auto-scroll</label>
-        </div>
-        <pre class="log-view" id="log-output" tabindex="0" aria-live="polite"></pre>
-      </section>
-
-      <!-- Activity -->
-      <section id="view-activity" class="view hidden">
-        <div class="view-head"><h2>Activity</h2><span class="spacer"></span><select id="activity-filter" aria-label="Filter by type"><option value="">All events</option></select></div>
-        <div class="table-wrap"><div class="table-scroll">
-          <table class="data">
-            <thead><tr><th class="nowrap">Time</th><th>Event</th><th>Details</th><th>User</th></tr></thead>
-            <tbody id="activity-tbody"></tbody>
-          </table>
-        </div></div>
-        <div class="row" id="activity-pager">
-          <button type="button" class="btn sm" id="activity-prev">Previous</button>
-          <span class="muted num" id="activity-page"></span>
-          <button type="button" class="btn sm" id="activity-next">Next</button>
-        </div>
-      </section>
-
-      <!-- Settings -->
-      <section id="view-settings" class="view hidden">
-        <div class="view-head"><h2>Settings</h2></div>
-        <div class="settings-grid">
+          <div id="metrics-error"></div>
 
           <div class="panel">
-            <div class="panel-head"><span class="panel-title">Change password</span></div>
-            <div class="panel-body">
-              <form id="form-change-password" class="form">
-                <div class="field"><label for="cp-current">Current password</label><input id="cp-current" type="password" autocomplete="current-password" required></div>
-                <div class="field"><label for="cp-new">New password</label><input id="cp-new" type="password" autocomplete="new-password" minlength="8" required><span class="hint">At least 8 characters.</span></div>
-                <div class="form-actions"><button type="submit" class="btn primary">Update password</button></div>
-              </form>
+            <div class="panel-head"><span class="panel-title">CPU usage</span><span class="spacer"></span><span
+                class="metric-stat" id="metrics-cpu-stat"></span></div>
+            <div class="panel-body chart-box tall"><canvas id="metrics-chart-cpu"></canvas></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><span class="panel-title">Memory usage</span><span class="spacer"></span><span
+                class="metric-stat" id="metrics-mem-stat"></span></div>
+            <div class="panel-body chart-box tall"><canvas id="metrics-chart-mem"></canvas></div>
+          </div>
+          <p class="hint metrics-hint">Drag across a chart to zoom into a time window · double-click a chart to reset.
+          </p>
+        </section>
+
+        <!-- Logs -->
+        <section id="view-logs" class="view hidden">
+          <div class="view-head">
+            <h2>Logs</h2><span class="badge" id="log-count"></span>
+          </div>
+          <div class="logs-toolbar">
+            <select id="log-process" aria-label="Select process"></select>
+            <button type="button" class="btn sm primary" id="log-start"><svg class="icon">
+                <use href="#i-play" />
+              </svg>Stream</button>
+            <button type="button" class="btn sm" id="log-stop"><svg class="icon">
+                <use href="#i-stop" />
+              </svg>Stop</button>
+            <button type="button" class="btn sm ghost" id="log-clear">Clear</button>
+            <span class="spacer"></span>
+            <label class="checkbox"><input type="checkbox" id="log-autoscroll" checked> Auto-scroll</label>
+          </div>
+          <pre class="log-view" id="log-output" tabindex="0" aria-live="polite"></pre>
+        </section>
+
+        <!-- Activity -->
+        <section id="view-activity" class="view hidden">
+          <div class="view-head">
+            <h2>Activity</h2><span class="spacer"></span><select id="activity-filter" aria-label="Filter by type">
+              <option value="">All events</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <div class="table-scroll">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th class="nowrap">Time</th>
+                    <th>Event</th>
+                    <th>Details</th>
+                    <th>User</th>
+                  </tr>
+                </thead>
+                <tbody id="activity-tbody"></tbody>
+              </table>
             </div>
           </div>
+          <div class="row" id="activity-pager">
+            <button type="button" class="btn sm" id="activity-prev">Previous</button>
+            <span class="muted num" id="activity-page"></span>
+            <button type="button" class="btn sm" id="activity-next">Next</button>
+          </div>
+        </section>
 
-          <div class="panel" id="twofa-panel">
-            <div class="panel-head"><span class="panel-title">Two-factor authentication</span></div>
-            <div class="panel-body">
-              <p class="muted" id="twofa-status">Checking…</p>
-              <div class="form-actions"><button type="button" class="btn" id="twofa-setup-btn"><svg class="icon"><use href="#i-key"/></svg>Set up 2FA</button></div>
-              <div id="twofa-setup" class="hidden twofa-setup">
-                <p class="hint">Scan this QR code with your authenticator app, then enter a code to confirm.</p>
-                <img id="twofa-qr" class="qr" alt="2FA QR code" width="164" height="164">
-                <p class="mono twofa-secret">Secret: <code id="twofa-secret"></code></p>
-                <form id="form-enable-2fa" class="form inline-form">
-                  <div class="field"><label for="enable-code">Verification code</label><input id="enable-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="\d{6}" maxlength="6" placeholder="123456" required></div>
-                  <div class="form-actions"><button type="submit" class="btn primary">Enable</button></div>
+        <!-- Settings -->
+        <section id="view-settings" class="view hidden">
+          <div class="view-head">
+            <h2>Settings</h2>
+          </div>
+          <div class="settings-grid">
+
+            <div class="panel">
+              <div class="panel-head"><span class="panel-title">Change password</span></div>
+              <div class="panel-body">
+                <form id="form-change-password" class="form">
+                  <div class="field"><label for="cp-current">Current password</label><input id="cp-current"
+                      type="password" autocomplete="current-password" required></div>
+                  <div class="field"><label for="cp-new">New password</label><input id="cp-new" type="password"
+                      autocomplete="new-password" minlength="8" required><span class="hint">At least 8
+                      characters.</span></div>
+                  <div class="form-actions"><button type="submit" class="btn primary">Update password</button></div>
                 </form>
               </div>
-              <form id="form-disable-2fa" class="form inline-form hidden">
-                <div class="field"><label for="disable-pass">Confirm password to disable</label><input id="disable-pass" type="password" autocomplete="current-password" required></div>
-                <div class="form-actions"><button type="submit" class="btn danger">Disable 2FA</button></div>
-              </form>
             </div>
+
+            <div class="panel" id="twofa-panel">
+              <div class="panel-head"><span class="panel-title">Two-factor authentication</span></div>
+              <div class="panel-body">
+                <p class="muted" id="twofa-status">Checking…</p>
+                <div class="form-actions"><button type="button" class="btn" id="twofa-setup-btn"><svg class="icon">
+                      <use href="#i-key" />
+                    </svg>Set up 2FA</button></div>
+                <div id="twofa-setup" class="hidden twofa-setup">
+                  <p class="hint">Scan this QR code with your authenticator app, then enter a code to confirm.</p>
+                  <img id="twofa-qr" class="qr" alt="2FA QR code" width="164" height="164">
+                  <p class="mono twofa-secret">Secret: <code id="twofa-secret"></code></p>
+                  <form id="form-enable-2fa" class="form inline-form">
+                    <div class="field"><label for="enable-code">Verification code</label><input id="enable-code"
+                        type="text" inputmode="numeric" autocomplete="one-time-code" pattern="\d{6}" maxlength="6"
+                        placeholder="123456" required></div>
+                    <div class="form-actions"><button type="submit" class="btn primary">Enable</button></div>
+                  </form>
+                </div>
+                <form id="form-disable-2fa" class="form inline-form hidden">
+                  <div class="field"><label for="disable-pass">Confirm password to disable</label><input
+                      id="disable-pass" type="password" autocomplete="current-password" required></div>
+                  <div class="form-actions"><button type="submit" class="btn danger">Disable 2FA</button></div>
+                </form>
+              </div>
+            </div>
+
+            <div class="panel admin-only hidden" id="settings-panel">
+              <div class="panel-head"><span class="panel-title">Metrics</span><span class="badge">Admin</span></div>
+              <div class="panel-body">
+                <form id="form-settings" class="form">
+                  <div class="field"><label for="metrics-interval">Sampling interval (seconds)</label><input
+                      id="metrics-interval" type="number" min="5" max="3600" required></div>
+                  <div class="field"><label for="metrics-retention">Retention (days)</label><input
+                      id="metrics-retention" type="number" min="1" max="365" required></div>
+                  <div class="form-actions"><button type="submit" class="btn primary">Save</button></div>
+                </form>
+              </div>
+            </div>
+
+            <div class="panel admin-only hidden" id="users-panel">
+              <div class="panel-head"><span class="panel-title">Users</span><span class="badge">Admin</span></div>
+              <div class="panel-body flush">
+                <div class="table-scroll">
+                  <table class="data">
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>2FA</th>
+                        <th class="col-actions"></th>
+                      </tr>
+                    </thead>
+                    <tbody id="users-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="panel-body">
+                <form id="form-create-user" class="form">
+                  <div class="field-label">Create user</div>
+                  <div class="field"><label for="nu-username">Username</label><input id="nu-username" type="text"
+                      minlength="3" maxlength="64" autocomplete="off" required></div>
+                  <div class="field"><label for="nu-password">Password</label><input id="nu-password" type="password"
+                      minlength="8" autocomplete="new-password" required></div>
+                  <label class="checkbox"><input id="nu-admin" type="checkbox"> Administrator</label>
+                  <div class="form-actions"><button type="submit" class="btn primary"><svg class="icon">
+                        <use href="#i-plus" />
+                      </svg>Create user</button></div>
+                </form>
+              </div>
+            </div>
+
           </div>
+        </section>
 
-          <div class="panel admin-only hidden" id="settings-panel">
-            <div class="panel-head"><span class="panel-title">Metrics</span><span class="badge">Admin</span></div>
-            <div class="panel-body">
-              <form id="form-settings" class="form">
-                <div class="field"><label for="metrics-interval">Sampling interval (seconds)</label><input id="metrics-interval" type="number" min="5" max="3600" required></div>
-                <div class="field"><label for="metrics-retention">Retention (days)</label><input id="metrics-retention" type="number" min="1" max="365" required></div>
-                <div class="form-actions"><button type="submit" class="btn primary">Save</button></div>
-              </form>
-            </div>
-          </div>
-
-          <div class="panel admin-only hidden" id="users-panel">
-            <div class="panel-head"><span class="panel-title">Users</span><span class="badge">Admin</span></div>
-            <div class="panel-body flush">
-              <div class="table-scroll"><table class="data"><thead><tr><th>User</th><th>Role</th><th>2FA</th><th class="col-actions"></th></tr></thead><tbody id="users-tbody"></tbody></table></div>
-            </div>
-            <div class="panel-body">
-              <form id="form-create-user" class="form">
-                <div class="field-label">Create user</div>
-                <div class="field"><label for="nu-username">Username</label><input id="nu-username" type="text" minlength="3" maxlength="64" autocomplete="off" required></div>
-                <div class="field"><label for="nu-password">Password</label><input id="nu-password" type="password" minlength="8" autocomplete="new-password" required></div>
-                <label class="checkbox"><input id="nu-admin" type="checkbox"> Administrator</label>
-                <div class="form-actions"><button type="submit" class="btn primary"><svg class="icon"><use href="#i-plus"/></svg>Create user</button></div>
-              </form>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-    </main>
+      </main>
+    </div>
   </div>
-</div>
 
-<!-- Process detail drawer ----------------------------------------------- -->
-<div class="drawer-overlay" id="drawer-overlay"></div>
-<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
-  <div class="drawer-head"><span class="title" id="drawer-title">Process</span><span class="spacer"></span><button type="button" class="icon-btn" id="drawer-close" aria-label="Close" data-tip="Close"><svg class="icon"><use href="#i-close"/></svg></button></div>
-  <div class="drawer-body" id="drawer-body"></div>
-</aside>
+  <!-- Process detail drawer ----------------------------------------------- -->
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <div class="drawer-head"><span class="title" id="drawer-title">Process</span><span class="spacer"></span><button
+        type="button" class="icon-btn" id="drawer-close" aria-label="Close" data-tip="Close"><svg class="icon">
+          <use href="#i-close" />
+        </svg></button></div>
+    <div class="drawer-body" id="drawer-body"></div>
+  </aside>
 
-<!-- Confirm modal ------------------------------------------------------- -->
-<div class="overlay" id="modal-overlay">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal-head"><div class="modal-icon danger" id="modal-icon"><svg class="icon lg"><use href="#i-alert"/></svg></div><div class="modal-title" id="modal-title">Confirm</div></div>
-    <div class="modal-body" id="modal-body"></div>
-    <div class="modal-foot"><button type="button" class="btn" id="modal-cancel">Cancel</button><button type="button" class="btn danger" id="modal-confirm">Confirm</button></div>
+  <!-- Confirm modal ------------------------------------------------------- -->
+  <div class="overlay" id="modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-head">
+        <div class="modal-icon danger" id="modal-icon"><svg class="icon lg">
+            <use href="#i-alert" />
+          </svg></div>
+        <div class="modal-title" id="modal-title">Confirm</div>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-foot"><button type="button" class="btn" id="modal-cancel">Cancel</button><button type="button"
+          class="btn danger" id="modal-confirm">Confirm</button></div>
+    </div>
   </div>
-</div>
 
-<!-- Toasts -->
-<div class="toasts" id="toasts"></div>
+  <!-- Toasts -->
+  <div class="toasts" id="toasts"></div>
 
-<script src="/static/js/api.js"></script>
-<script src="/static/js/chart.js"></script>
-<script src="/static/js/app.js"></script>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/chart.js"></script>
+  <script src="/static/js/app.js"></script>
 </body>
+
 </html>

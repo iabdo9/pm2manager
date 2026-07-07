@@ -368,11 +368,15 @@
     var pts = lastHistory || [];
     var xf = xFormatFor(RANGE_MS[dashRange] || RANGE_MS['6h']);
     window.drawLineChart(byId('chart-cpu'), pts.map(function (p) { return { x: p.timestamp, y: p.cpu }; }),
-      { color: c.accent, fill: c.fill, grid: c.grid, axis: c.axis, text: c.text, xFormat: xf, label: 'CPU',
-        yFormat: function (v) { return Math.round(v) + '%'; }, valueFormat: function (v) { return v.toFixed(1) + '%'; }, interactive: true });
+      {
+        color: c.accent, fill: c.fill, grid: c.grid, axis: c.axis, text: c.text, xFormat: xf, label: 'CPU',
+        yFormat: function (v) { return Math.round(v) + '%'; }, valueFormat: function (v) { return v.toFixed(1) + '%'; }, interactive: true
+      });
     window.drawLineChart(byId('chart-mem'), pts.map(function (p) { return { x: p.timestamp, y: p.memory / 1048576 }; }),
-      { color: c.accent2, fill: c.fill2, grid: c.grid, axis: c.axis, text: c.text, xFormat: xf, label: 'Memory',
-        yFormat: function (v) { return Math.round(v) + ' MB'; }, valueFormat: function (v) { return fmtBytes(v * 1048576); }, interactive: true });
+      {
+        color: c.accent2, fill: c.fill2, grid: c.grid, axis: c.axis, text: c.text, xFormat: xf, label: 'Memory',
+        yFormat: function (v) { return Math.round(v) + ' MB'; }, valueFormat: function (v) { return fmtBytes(v * 1048576); }, interactive: true
+      });
   }
 
   // ======================================================================
