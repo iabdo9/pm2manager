@@ -116,13 +116,26 @@
     return s + 's';
   }
   function fmtPct(v) { return (v == null || isNaN(v) ? 0 : v).toFixed(1) + '%'; }
+
+  // Server timestamps from SQLite `datetime('now')` are UTC but formatted as
+  // "YYYY-MM-DD HH:MM:SS" with no timezone marker — browsers parse that space
+  // form as LOCAL time, skewing it by the client's UTC offset. Parse those as
+  // UTC (append Z). Numeric values (epoch ms, e.g. PM2 createdAt) and strings
+  // that already carry a timezone are absolute and left as-is.
+  function parseServerDate(v) {
+    if (typeof v === 'number') return new Date(v);
+    if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}$/.test(v)) {
+      return new Date(v.replace(' ', 'T') + 'Z');
+    }
+    return new Date(v);
+  }
   function fmtDate(v) {
     if (v == null) return '—';
-    var d = new Date(v);
+    var d = parseServerDate(v);
     return isNaN(d.getTime()) ? '—' : d.toLocaleString();
   }
   function timeAgo(iso) {
-    var t = new Date(iso).getTime();
+    var t = parseServerDate(iso).getTime();
     if (isNaN(t)) return '';
     var s = Math.floor((Date.now() - t) / 1000);
     if (s < 60) return s + 's ago';
