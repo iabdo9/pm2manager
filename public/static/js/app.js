@@ -38,8 +38,8 @@
   // Polling cadence. The Dashboard refreshes its live summary every 0.5s; the
   // charts refresh only every HISTORY_REFRESH_TICKS ticks (~15s) because the
   // server samples metric history at that interval — redrawing faster is waste.
-  var DASHBOARD_POLL_MS = 500;
-  var PROCESS_POLL_MS = 5000;
+  var DASHBOARD_POLL_MS = 1000;
+  var PROCESS_POLL_MS = 1000;
   var HISTORY_REFRESH_TICKS = 30; // 30 × 500ms ≈ 15s
 
   var VIEW_TITLES = {
@@ -740,7 +740,7 @@
       pollTimer = setInterval(function () {
         // Don't disrupt an open menu / dialog / drawer with a re-render.
         if (busy || qs('.menu.open') || byId('modal-overlay').classList.contains('open') ||
-            byId('drawer').classList.contains('open')) return;
+          byId('drawer').classList.contains('open')) return;
         tick++;
         busy = true;
         var done = function () { busy = false; };
