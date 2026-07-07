@@ -105,11 +105,19 @@ export function createApp(): Express {
   });
 
   // --- Static assets (no secrets; safe to serve openly) -------------------
+  // Use `no-cache` (revalidate via ETag on every load) rather than a long
+  // max-age: this is an admin tool without asset fingerprinting, so a deploy
+  // must take effect on the next page load — not up to an hour later. Unchanged
+  // files return a cheap 304, so the bandwidth cost is negligible.
   app.use(
     '/static',
     express.static(path.join(PUBLIC_DIR, 'static'), {
       index: false,
-      maxAge: config.isProduction ? '1h' : 0,
+      etag: true,
+      lastModified: true,
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-cache');
+      },
     }),
   );
 
