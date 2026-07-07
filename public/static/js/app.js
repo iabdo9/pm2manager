@@ -40,10 +40,28 @@
   // server samples metric history at that interval — redrawing faster is waste.
   var DASHBOARD_POLL_MS = 1000;
   var PROCESS_POLL_MS = 1000;
+  var METRICS_POLL_MS = 5000;
   var HISTORY_REFRESH_TICKS = 30; // 30 × 500ms ≈ 15s
 
+  // Metrics page state — deliberately module-scoped so the selected range is
+  // preserved when switching between processes / navigating away and back.
+  var metricsProcess = null;
+  var metricsRange = '1h';
+  var metricsLastPreset = '1h'; // range to return to when a zoom is reset
+  var metricsCustom = { from: null, to: null };
+  var metricsSeries = { points: [], span: 0 };
+
+  // Dashboard overview chart range.
+  var dashRange = '6h';
+
+  // Shorthand range → span in ms (mirrors the backend).
+  var RANGE_MS = {
+    '15m': 900000, '30m': 1800000, '1h': 3600000, '6h': 21600000,
+    '12h': 43200000, '24h': 86400000, '7d': 604800000, '30d': 2592000000
+  };
+
   var VIEW_TITLES = {
-    dashboard: 'Dashboard', processes: 'Processes',
+    dashboard: 'Dashboard', processes: 'Processes', metrics: 'Process metrics',
     logs: 'Logs', activity: 'Activity', settings: 'Settings'
   };
   var ACTIVITY_TYPES = [
@@ -147,6 +165,24 @@
   function typeLabel(t) { return String(t || '').replace(/_/g, ' '); }
   function debounce(fn, ms) {
     var t; return function () { var a = arguments, self = this; clearTimeout(t); t = setTimeout(function () { fn.apply(self, a); }, ms); };
+  }
+  function pad2(n) { return ('0' + n).slice(-2); }
+
+  // Range-aware x-axis label formatter chosen from the visible span:
+  // short spans → clock time, multi-day → date+time, long spans → date only.
+  function xFormatFor(spanMs) {
+    if (spanMs <= 24 * 3600000) {
+      return function (ms) { var d = new Date(ms); return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
+    }
+    if (spanMs <= 7 * 86400000) {
+      return function (ms) { var d = new Date(ms); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
+    }
+    return function (ms) { var d = new Date(ms); return (d.getMonth() + 1) + '/' + d.getDate(); };
+  }
+  // Format an epoch-ms value for a <input type="datetime-local"> (local time).
+  function toLocalInput(ms) {
+    var d = new Date(ms);
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + 'T' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
   }
 
   // ---- toasts ------------------------------------------------------------
@@ -255,7 +291,7 @@
   // Charts only. History is sampled server-side every ~15s, so it is refreshed
   // on a slower cadence than the live summary (no point re-drawing at 0.5s).
   function loadHistory() {
-    return api.get('/api/history?range=6h').then(function (h) {
+    return api.get('/api/history?range=' + dashRange).then(function (h) {
       lastHistory = (h && h.points) || [];
       redrawCharts();
     }).catch(function () { lastHistory = []; redrawCharts(); });
@@ -330,10 +366,13 @@
     if (!window.drawLineChart) return;
     var c = themeColors();
     var pts = lastHistory || [];
+    var xf = xFormatFor(RANGE_MS[dashRange] || RANGE_MS['6h']);
     window.drawLineChart(byId('chart-cpu'), pts.map(function (p) { return { x: p.timestamp, y: p.cpu }; }),
-      { color: c.accent, fill: c.fill, grid: c.grid, axis: c.axis, text: c.text, yFormat: function (v) { return Math.round(v) + '%'; } });
+      { color: c.accent, fill: c.fill, grid: c.grid, axis: c.axis, text: c.text, xFormat: xf, label: 'CPU',
+        yFormat: function (v) { return Math.round(v) + '%'; }, valueFormat: function (v) { return v.toFixed(1) + '%'; }, interactive: true });
     window.drawLineChart(byId('chart-mem'), pts.map(function (p) { return { x: p.timestamp, y: p.memory / 1048576 }; }),
-      { color: c.accent2, fill: c.fill2, grid: c.grid, axis: c.axis, text: c.text, yFormat: function (v) { return Math.round(v) + ' MB'; } });
+      { color: c.accent2, fill: c.fill2, grid: c.grid, axis: c.axis, text: c.text, xFormat: xf, label: 'Memory',
+        yFormat: function (v) { return Math.round(v) + ' MB'; }, valueFormat: function (v) { return fmtBytes(v * 1048576); }, interactive: true });
   }
 
   // ======================================================================
@@ -721,12 +760,118 @@
   }
 
   // ======================================================================
+  // Metrics (per-process history)
+  // ======================================================================
+  function loadMetrics() {
+    // Merge live process names with names that have stored history so that
+    // stopped/offline processes remain selectable and their history viewable.
+    return Promise.all([
+      api.get('/api/processes').then(function (d) { return (d.processes || []).map(function (p) { return p.name; }); }).catch(function () { return []; }),
+      api.get('/api/history/names').then(function (d) { return d.names || []; }).catch(function () { return []; })
+    ]).then(function (res) {
+      var seen = {}, names = [];
+      res[0].concat(res[1]).forEach(function (n) { if (n && !seen[n]) { seen[n] = 1; names.push(n); } });
+      names.sort(function (a, b) { return a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0; });
+
+      var sel = byId('metrics-process');
+      clear(sel);
+      if (!names.length) {
+        sel.appendChild(el('option', { value: '', text: 'No process history yet' }));
+        metricsProcess = null;
+      } else {
+        names.forEach(function (n) { sel.appendChild(el('option', { value: n, text: n })); });
+        if (!metricsProcess || names.indexOf(metricsProcess) === -1) metricsProcess = names[0];
+        sel.value = metricsProcess;
+      }
+      byId('metrics-range').value = metricsRange;
+      toggleCustom(metricsRange === 'custom');
+      return fetchMetrics();
+    });
+  }
+
+  function toggleCustom(show) { byId('metrics-custom').classList.toggle('hidden', !show); }
+
+  function fetchMetrics() {
+    if (!metricsProcess) { metricsSeries = { points: [], span: RANGE_MS['1h'] }; drawMetricsCharts(); return Promise.resolve(); }
+    var url = '/api/history?name=' + enc(metricsProcess);
+    if (metricsRange === 'custom') {
+      if (metricsCustom.from == null || metricsCustom.to == null) return Promise.resolve();
+      url += '&since=' + metricsCustom.from + '&until=' + metricsCustom.to;
+    } else {
+      url += '&range=' + metricsRange;
+    }
+    var errBox = byId('metrics-error'); clear(errBox);
+    return api.get(url).then(function (h) {
+      metricsSeries = { points: h.points || [], span: (h.until - h.since) || RANGE_MS[metricsRange] || RANGE_MS['6h'] };
+      drawMetricsCharts();
+    }).catch(function (err) {
+      metricsSeries = { points: [], span: RANGE_MS['6h'] };
+      drawMetricsCharts();
+      errBox.appendChild(el('div', { class: 'error-banner' }, [icon('alert'), el('span', { class: 'spacer', text: (err && err.message) || 'Failed to load metrics' })]));
+    });
+  }
+
+  function drawMetricsCharts() {
+    if (!window.drawLineChart) return;
+    var c = themeColors();
+    var pts = metricsSeries.points || [];
+    var xf = xFormatFor(metricsSeries.span || RANGE_MS[metricsRange] || RANGE_MS['6h']);
+    var cpuPts = pts.map(function (p) { return { x: p.timestamp, y: p.cpu }; });
+    var memPts = pts.map(function (p) { return { x: p.timestamp, y: p.memory / 1048576 }; });
+
+    window.drawLineChart(byId('metrics-chart-cpu'), cpuPts, {
+      color: c.accent, fill: c.fill, grid: c.grid, axis: c.axis, text: c.text,
+      xFormat: xf, label: 'CPU', yFormat: function (v) { return Math.round(v) + '%'; },
+      valueFormat: function (v) { return v.toFixed(1) + '%'; },
+      interactive: true, onZoom: onMetricsZoom, onReset: onMetricsReset, empty: 'No CPU history for this range'
+    });
+    window.drawLineChart(byId('metrics-chart-mem'), memPts, {
+      color: c.accent2, fill: c.fill2, grid: c.grid, axis: c.axis, text: c.text,
+      xFormat: xf, label: 'Memory', yFormat: function (v) { return Math.round(v) + ' MB'; },
+      valueFormat: function (v) { return fmtBytes(v * 1048576); },
+      interactive: true, onZoom: onMetricsZoom, onReset: onMetricsReset, empty: 'No memory history for this range'
+    });
+
+    metricStat('metrics-cpu-stat', cpuPts, function (v) { return v.toFixed(1) + '%'; });
+    metricStat('metrics-mem-stat', memPts, function (v) { return fmtBytes(v * 1048576); });
+  }
+
+  function metricStat(id, pts, fmt) {
+    var node = byId(id);
+    if (!pts.length) { node.textContent = ''; return; }
+    var peak = 0;
+    for (var i = 0; i < pts.length; i++) if (pts[i].y > peak) peak = pts[i].y;
+    node.textContent = 'now ' + fmt(pts[pts.length - 1].y) + '  ·  peak ' + fmt(peak);
+  }
+
+  // Brush-zoom: selecting a window on a chart switches to a custom range and
+  // refetches (the backend re-buckets, giving finer resolution as you zoom in).
+  function onMetricsZoom(from, to) {
+    if (!(to - from > 1000)) return;
+    metricsRange = 'custom';
+    metricsCustom = { from: from, to: to };
+    byId('metrics-range').value = 'custom';
+    toggleCustom(true);
+    byId('metrics-from').value = toLocalInput(from);
+    byId('metrics-to').value = toLocalInput(to);
+    fetchMetrics();
+  }
+  function onMetricsReset() {
+    metricsRange = metricsLastPreset || '1h';
+    metricsCustom = { from: null, to: null };
+    byId('metrics-range').value = metricsRange;
+    toggleCustom(false);
+    fetchMetrics();
+  }
+
+  // ======================================================================
   // View routing + polling
   // ======================================================================
   function loadView(name) {
     switch (name) {
       case 'dashboard': return loadDashboard();
       case 'processes': return loadProcesses();
+      case 'metrics': return loadMetrics();
       case 'logs': return loadLogs();
       case 'activity': return loadActivity();
       case 'settings': return loadSettings();
@@ -737,6 +882,7 @@
   function showView(name) {
     if (currentView === 'logs' && name !== 'logs') stopLogs();
     stopPolling();
+    var tip = byId('chart-tip'); if (tip) tip.classList.add('hidden'); // dismiss any lingering chart tooltip
     currentView = name;
     qsa('.view').forEach(function (s) { s.classList.add('hidden'); });
     var sec = byId('view-' + name); if (sec) sec.classList.remove('hidden');
@@ -746,7 +892,9 @@
 
     Promise.resolve().then(function () { return loadView(name); }).catch(reportError);
 
-    var interval = name === 'dashboard' ? DASHBOARD_POLL_MS : name === 'processes' ? PROCESS_POLL_MS : 0;
+    var interval = name === 'dashboard' ? DASHBOARD_POLL_MS
+      : name === 'processes' ? PROCESS_POLL_MS
+        : name === 'metrics' ? METRICS_POLL_MS : 0;
     if (interval) {
       var tick = 0;
       var busy = false; // skip a tick if the previous refresh is still in flight
@@ -763,6 +911,11 @@
           var jobs = [loadDashboardSummary().catch(function () { })];
           if (tick % HISTORY_REFRESH_TICKS === 0) jobs.push(loadHistory().catch(function () { }));
           Promise.all(jobs).then(done, done);
+        } else if (name === 'metrics') {
+          // Auto-update the running process's series; a fixed custom window is
+          // historical, so it isn't auto-slid.
+          if (metricsRange === 'custom') { done(); return; }
+          fetchMetrics().then(done, done);
         } else {
           Promise.resolve().then(function () { return loadView(name); }).then(done, done);
         }
@@ -793,6 +946,39 @@
 
     // dashboard
     byId('dash-refresh').addEventListener('click', function () { loadDashboard().catch(reportError); });
+    byId('dash-range').addEventListener('change', function (e) { dashRange = e.target.value; loadHistory().catch(reportError); });
+
+    // metrics (per-process history)
+    byId('metrics-process').addEventListener('change', function (e) {
+      metricsProcess = e.target.value || null; // range is preserved across process switches
+      fetchMetrics();
+    });
+    byId('metrics-range').addEventListener('change', function (e) {
+      var v = e.target.value;
+      if (v === 'custom') {
+        metricsRange = 'custom';
+        if (metricsCustom.from == null) {
+          var now = Date.now();
+          metricsCustom = { from: now - RANGE_MS['1h'], to: now };
+        }
+        byId('metrics-from').value = toLocalInput(metricsCustom.from);
+        byId('metrics-to').value = toLocalInput(metricsCustom.to);
+        toggleCustom(true);
+        fetchMetrics();
+      } else {
+        metricsRange = v; metricsLastPreset = v; metricsCustom = { from: null, to: null };
+        toggleCustom(false);
+        fetchMetrics();
+      }
+    });
+    byId('metrics-apply').addEventListener('click', function () {
+      var f = byId('metrics-from').value, t = byId('metrics-to').value;
+      if (!f || !t) { toast('Pick both a start and end time', 'error'); return; }
+      var from = new Date(f).getTime(), to = new Date(t).getTime();
+      if (isNaN(from) || isNaN(to) || to <= from) { toast('End time must be after start time', 'error'); return; }
+      metricsRange = 'custom'; metricsCustom = { from: from, to: to };
+      fetchMetrics();
+    });
 
     // processes: sorting
     qsa('#process-table th.sortable').forEach(function (th) {
@@ -896,9 +1082,13 @@
       }
     });
 
-    // charts react to theme + resize
-    document.addEventListener('themechange', function () { if (currentView === 'dashboard') redrawCharts(); });
-    window.addEventListener('resize', debounce(function () { if (currentView === 'dashboard') redrawCharts(); }, 180));
+    // charts react to theme + resize (both the dashboard overview and metrics)
+    var redrawActive = function () {
+      if (currentView === 'dashboard') redrawCharts();
+      else if (currentView === 'metrics') drawMetricsCharts();
+    };
+    document.addEventListener('themechange', redrawActive);
+    window.addEventListener('resize', debounce(redrawActive, 180));
   }
 
   function applyAdminVisibility() {

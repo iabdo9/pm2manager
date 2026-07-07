@@ -88,12 +88,26 @@ export const logStreamParamSchema = processIdParamSchema;
 
 // --- History / metrics ----------------------------------------------------
 
+export const historyRangeEnum = z.enum([
+  '15m',
+  '30m',
+  '1h',
+  '6h',
+  '12h',
+  '24h',
+  '7d',
+  '30d',
+]);
+
 export const historyQuerySchema = z.object({
   /** Optional process name; when omitted, aggregate/overall series is returned. */
   name: z.string().trim().min(1).max(200).optional(),
   /** Shorthand time range. */
-  range: z.enum(['1h', '6h', '24h', '7d']).optional().default('6h'),
-  /** Explicit bounds (epoch ms) override `range` when provided. */
+  range: historyRangeEnum.optional().default('6h'),
+  /**
+   * Explicit bounds (epoch ms) for a custom range; when both are provided they
+   * override `range`. `until` alone (with `range`) shifts the window's end.
+   */
   since: z.coerce.number().int().nonnegative().optional(),
   until: z.coerce.number().int().nonnegative().optional(),
 });

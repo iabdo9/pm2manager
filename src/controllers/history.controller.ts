@@ -17,16 +17,22 @@ const DAY_MS = 86_400_000;
 
 /** Duration (ms) represented by each shorthand `range` value. */
 const RANGE_MS: Record<HistoryQuery['range'], number> = {
+  '15m': 900_000,
+  '30m': 1_800_000,
   '1h': 3_600_000,
   '6h': 21_600_000,
+  '12h': 43_200_000,
   '24h': 86_400_000,
   '7d': 604_800_000,
+  '30d': 2_592_000_000,
 };
 
 export const historyController = {
   /**
-   * GET /api/history — return a metrics time-series.
-   * Query is pre-validated by `historyQuerySchema`.
+   * GET /api/history — return a downsampled metrics time-series for one process
+   * (when `name` is given) or the aggregate across all processes. The window is
+   * a custom [since, until] when both are supplied, otherwise a shorthand
+   * `range` ending now. Query is pre-validated by `historyQuerySchema`.
    */
   series: asyncHandler(async (req, res) => {
     const query = req.query as unknown as HistoryQuery;
